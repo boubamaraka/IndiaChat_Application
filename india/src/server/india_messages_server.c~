@@ -1,0 +1,246 @@
+/******
+INDIA MESSAGE HEADER
+******/
+# include "../protocol/india_messages_protocol.h"
+
+#define LISTENQ 10
+
+
+
+int show_server_ips(void)
+{
+	struct ifaddrs *ifaddr, *ifa;
+        int family, s, n, y;
+        char host[NI_MAXHOST];
+
+           if (getifaddrs(&ifaddr) == -1) {
+               perror("getifaddrs");
+               return -1;
+           }
+
+           /* Walk through linked list, maintaining head pointer so we
+              can free list later */
+
+           for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa->ifa_next, n++)
+		{
+               		if (ifa->ifa_addr == NULL)
+                   		continue;
+
+               		family = ifa->ifa_addr->sa_family;
+
+              		 /* For an AF_INET* interface address, display the address */
+
+               if (family == AF_INET || family == AF_INET6)
+			{
+                   		s = getnameinfo(ifa->ifa_addr,
+                           	(family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6),
+                           	host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+                   		if (s != 0)
+					{
+                       				printf("getnameinfo() failed: %s\n", gai_strerror(s));
+                       				return -1;
+                   			}
+
+                  		printf("\t\taddress: <%s>\n", host);
+
+               }
+
+           }
+
+       	freeifaddrs(ifaddr);
+	return 1;
+}
+
+
+
+int main(void)
+{
+
+
+	int 	debug = 1;
+	int 	listenfd = 0;
+
+	if ((listenfd = socket(AF_INET6, SOCK_STREAM, 0)) < 0)
+		{
+			perror("socket");
+			return -1;
+		}
+
+	if (debug) { printf("listenfd: %d\n", listenfd); }
+
+    	// Pick a port and bind socket to it.
+
+	// ask port number from user
+	int	port = 0;
+
+	printf("Give port number to server: ");
+	scanf ("%d",&port);
+
+	struct sockaddr_in6 	myservaddr, cliaddr;
+
+    	// Accept connections from any address.
+
+    	memset(&myservaddr, 0, sizeof(myservaddr));
+    	myservaddr.sin6_family = AF_INET6;
+    	myservaddr.sin6_addr = in6addr_any;
+		myservaddr.sin6_port = port;
+
+    	if (bind(listenfd, (struct sockaddr *) &myservaddr, sizeof(myservaddr)) < 0) 
+    	   { 
+    	   		perror("bind"); return -1; 
+    	   }
+
+	if (debug) { printf("BIND OK\n"); }
+
+	// Set the socket to passive mode, with specified listen queue size
+
+	if (listen(listenfd, LISTENQ) < 0) { perror("listen"); return -1; }
+
+	// tell user used address to configure client
+
+	struct sockaddr_in6* pV6Addr = (struct sockaddr_in6*)&myservaddr;
+	struct in6_addr ipAddr       = pV6Addr->sin6_addr;
+
+	//and getting a string is almost identical to IPV4
+
+	char str[INET6_ADDRSTRLEN];
+	inet_ntop( AF_INET6, &ipAddr, str, INET6_ADDRSTRLEN );
+	printf("\n***************************************");
+	printf( "\nServer listens on port %d, \nit has following network interfaces:\n", port );
+	
+	show_server_ips();
+	printf("\n***************************************");
+	printf("\n\n\n******** SERVER IS NOW RUNNING ********\n\n\n");
+
+
+	int 			numfds, maxfd;
+	maxfd 			= listenfd + 1;
+	int				connfd 			= -1;
+	fd_set 			rset;
+	socklen_t		len;
+	struct timeval 	tv;
+	char 			buff[80];
+	int				ret_value = -2;
+
+	// Start waiting for incoming connections, until user interrupts
+	for ( ; ; )
+		{
+
+        		FD_ZERO(&rset);
+        		FD_SET(listenfd, &rset);
+        		if (connfd >= 0)
+				{
+					FD_SET(connfd, &rset);
+				}
+			len = sizeof(cliaddr);
+			// SET TIMER
+			tv.tv_sec = 90; 	// 300 = 5 min, 90 = 1,5min
+        		tv.tv_usec = 0;
+
+        		if ((numfds = select(maxfd, &rset, NULL, NULL, &tv)) < 0) { perror("select"); return -1; }
+
+        		if (FD_ISSET(listenfd, &rset))
+				{
+
+				 	// wait for incoming connection
+					// new socket fd will be used in return
+
+					memset(&cliaddr, 0, sizeof(cliaddr));
+
+					if ((connfd = accept(listenfd, (struct sockaddr *) &cliaddr, &len)) < 0)
+						{
+							if (errno == EINTR)
+								{
+									perror("accept");
+									continue;		/* back to for() */
+								}
+							perror("accept"); break;
+						}
+					printf("connection from %s, port %d, has connfd %d\n", inet_ntop(AF_INET6, &cliaddr.sin6_addr, buff, sizeof(buff)), ntohs(cliaddr.sin6_port), connfd);
+
+					int val;
+/*LETS BLOCK
+					val = fcntl(connfd, F_GETFL, 0);
+
+					if (fcntl(connfd, F_SETFL, val | O_NONBLOCK) < 0)
+						{
+							printf("connfd:%d\n",connfd);
+    							perror("fcntl(connfd)");
+    							break;
+						}
+*/
+
+					struct india_universal_message msg;
+					struct india_universal_message *msg_ptr;
+					msg_ptr = &msg;
+
+					char *text_ptr;
+					char nn[NAME_LENGHT];
+					char pw[PW_LENGHT];
+
+					val = read_universal_india_message( msg_ptr,  connfd, &text_ptr );
+					// val = read(connfd, &temp, sizeof(temp));
+					strcpy(nn, msg.proposed_nickname);
+					strcpy(pw, msg.password);
+
+					printf("message: %d\n", msg.id);
+					printf("Nickname: %s\n", &nn[0]);
+					printf("Password: %s\n", &pw[0]);
+
+					val = read_universal_india_message( msg_ptr,  connfd, &text_ptr );
+
+					strcpy(nn, msg.sender);
+					strcpy(pw, msg.password);
+
+					printf("message: %d\n", msg.id);
+					printf("Nickname: %s\n", &nn[0]);
+					printf("Password: %s\n", &pw[0]);
+
+					char cr[NAME_LENGHT];
+
+					val = read_universal_india_message( msg_ptr,  connfd, &text_ptr );
+					printf("message: %d\n", msg.id);
+					strcpy(nn, msg.sender);
+					printf("Sender: %s\n", &nn[0]);
+					strcpy(cr, msg.chat_room_name);
+					printf("Chat room: %s\n", &cr[0]);
+					printf("text data: %s\n", &text_ptr[0]);
+					free(text_ptr);
+
+					if(val <0)
+						{
+							printf("client has closed connection\n");
+							break;
+						}
+					else
+						{
+							//printf("client has send %d\n", msg.id);
+							continue;
+						}
+
+					if (connfd >= maxfd) { maxfd = connfd + 1; }
+
+//					printf("maxfd = %d,\n", maxfd);
+				}
+
+			if (connfd >= 0 /*&& FD_ISSET(connfd, &rset)*/ )
+			{
+
+
+			}
+
+        		if (numfds == 0)
+				{
+					printf("Timer expired\n");
+					break;
+				}
+
+    		} // end of for loop
+
+
+	close(listenfd);
+
+	return 1;
+
+	// printf( "\nServer address for client is %s, port %d, \n", inet_ntop(AF_INET6, &myservaddr.sin6_addr, buff, sizeof(buff)), ntohs(myservaddr.sin6_port) );
+ }

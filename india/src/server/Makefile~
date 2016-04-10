@@ -1,0 +1,14 @@
+PROGS=server
+CC=gcc
+CFLAGS=-Wall -pedantic -g -std=c99 
+
+
+all: server cleanobjects 
+
+server:
+	$(CC) -o server $(CFLAGS) india_messages_protocol.c india_messages_server.c
+cleanobjects:
+	rm -f *.o
+
+clean:
+	rm -f ${PROGS} *~ *.a

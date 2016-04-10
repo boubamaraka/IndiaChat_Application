@@ -1,0 +1,44 @@
+^C
+root@fofana88-X551CA:~/Desktop/Project_INternetProtocol/india/src/client# clear
+[A
+[H[Jroot@fofana88-X551CA:~/Desktop/Project_INternetProtocol/india/src/client# rm cl
+ient
+root@fofana88-X551CA:~/Desktop/Project_INternetProtocol/india/src/client# make
+gcc -o client -w -g india_message_register.c india_messages_protocol.c -pthread
+rm -f *.o
+root@fofana88-X551CA:~/Desktop/Project_INternetProtocol/india/src/client# ./c[D[K[D[K[D[Kmake[D[D[D[Drm cl
+ient[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cclear
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C./cli
+ent 10.0.0.3 5000
+The address version is IPv4 
+Do you want to Register or Login? press L/l for login or R/r for Registration 
+l
+[35mWELCOME TO LOGIN[0m
+Please:Enter username that is  between 1  to 10 character :
+paul
+Enter your password <Max 5 carater>:
+****[34mWELCOME TO INDIAN CHAT APPLICATION[0m
+[32m###########################################################
+[0m[32m#          Those are the rules to follow:                 #
+[0m[32m###########################################################
+[0m[33mIf You need help  type /help or /h
+To quit type /quit or /q
+To show chat room type /chatrooms or /list
+To show users type /users or /showusers
+/PVM <username> Send a private message to given username
+/Group <Groupname> Send a public message to given groupname
+/EXIT <groupname> To exit a  chat room 
+[0m/PVM bouba
+hey
+[35m<< 19:48:53.570 >> [32mFrom bouba: arrival_time: 13.000000 [0mhi
+[35m<< 19:49:01.379 >> [32mFrom bouba: arrival_time: 21.000000 [0mhelloooooooooooooooooooooooooooooooooooooooooooooo
+[35m<< 19:49:08.847 >> [32mFrom bouba: arrival_time: 28.000000 [0mhow r u doing
+[35m<< 19:49:15.823 >> [32mFrom bouba: arrival_time: 35.000000 [0mis evrebeeeeeeeeeeeeeeeeeeeee
+[35m<< 19:49:20.866 >> [32mFrom bouba: arrival_time: 40.000000 [0meeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+[35m<< 19:49:25.584 >> [32mFrom bouba: arrival_time: 45.000000 [0meeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+[35m<< 19:49:30.276 >> [32mFrom bouba: arrival_time: 50.000000 [0meeeeeeeeeeeeeeeeeeeeeeeeeee
+[35m<< 19:49:35.158 >> [32mFrom bouba: arrival_time: 55.000000 [0meeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeee
+[35m<< 19:49:47.525 >> [32mFrom bouba: arrival_time: 10.000000 [0meeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+[35m<< 19:50:02.616 >> [32mFrom bouba: arrival_time: 11.000000 [0meeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee

@@ -1,0 +1,14 @@
+PROGS=client
+CC=gcc
+CFLAGS=-Wall -pedantic -g -std=c99 
+
+
+all: client cleanobjects 
+
+client:
+	$(CC) -o client $(CFLAGS) india_messages_protocol.c india_messages_test_client.c
+cleanobjects:
+	rm -f *.o
+
+clean:
+	rm -f ${PROGS} *~ *.a
